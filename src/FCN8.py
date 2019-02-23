@@ -21,8 +21,63 @@ def FCN8(input_height, input_width):
 	x = MaxPooling2D((2, 2), strides=(2,2), name='block1_pool', \
 		data_format='channels_last')(x)
 
+	#Block 2 
+	x = Conv2D(128, (3,3), activation='relu', padding='same', \
+		name='block2_conv1', data_format='channels_last')\
+		(x)
+	x = Conv2D(128, (3,3), activation='relu', padding='same', \
+		name='block2_conv2', data_format='channels_last')\
+		(x)
+	x = MaxPooling2D((2, 2), strides=(2,2), name='block2_pool', \
+		data_format='channels_last')(x)
+
+	#Block 3
+	x = Conv2D(256, (3,3), activation='relu', padding='same', \
+		name='block3_conv1', data_format='channels_last')\
+		(x)
+	x = Conv2D(256, (3,3), activation='relu', padding='same', \
+		name='block3_conv2', data_format='channels_last')\
+		(x)
+	x = Conv2D(256, (3,3), activation='relu', padding='same', \
+		name='block3_conv3', data_format='channels_last')\
+		(x)
+	x = MaxPooling2D((2, 2), strides=(2,2), name='block3_pool', \
+		data_format='channels_last')(x)
+
+	#Block 4
+	x = Conv2D(512, (3,3), activation='relu', padding='same', \
+		name='block4_conv1', data_format='channels_last')\
+		(x)
+	x = Conv2D(512, (3,3), activation='relu', padding='same', \
+		name='block4_conv2', data_format='channels_last')\
+		(x)
+	x = Conv2D(512, (3,3), activation='relu', padding='same', \
+		name='block4_conv3', data_format='channels_last')\
+		(x)
+	x = MaxPooling2D((2, 2), strides=(2,2), name='block4_pool', \
+		data_format='channels_last')(x)
+
+	#Block 5
+	x = Conv2D(512, (3,3), activation='relu', padding='same', \
+		name='block5_conv1', data_format='channels_last')\
+		(x)
+	x = Conv2D(512, (3,3), activation='relu', padding='same', \
+		name='block5_conv2', data_format='channels_last')\
+		(x)
+	x = Conv2D(512, (3,3), activation='relu', padding='same', \
+		name='block5_conv3', data_format='channels_last')\
+		(x)
+	x = MaxPooling2D((2, 2), strides=(2,2), name='block5_pool', \
+		data_format='channels_last')(x)
+
+	x = (Conv2D(4096, (8,8), activation='relu', padding='same', \
+		name='conv6', data_format='channels_last'))(x)
+
+	x = (Conv2D(4096, (1,1), activation='relu', padding='same', \
+		name='conv7', data_format='channels_last'))(x)
+
 	#Test
-	x = (Conv2DTranspose(3, kernel_size=(2, 2), strides=(2, 2), \
+	x = (Conv2DTranspose(3, kernel_size=(32, 32), strides=(32, 32), \
 		use_bias=False, data_format='channels_last'))(x)
 	x = (Activation('softmax'))(x)
 
@@ -63,4 +118,4 @@ pred_img = np.argmax(pred, axis=3)
 fig = plt.figure(figsize=(10, 10))
 ax = fig.add_subplot(111)
 ax.imshow(pred_img[0])
-plt.show()
+#plt.show()
