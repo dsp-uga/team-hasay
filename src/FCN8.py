@@ -100,18 +100,42 @@ def FCN8(input_height, input_width, n_classes):
 
 	return Model(input_img, x)
 
+#Main
+train_names = open('../../bucket/train.txt').read().split()
+x_train = []
+y_train = []
+img_shape = []
+for file_name in train_names:
+	#Train Images
+	img = cv2.imread('../../bucket/data/' + file_name + '/frame0000.png')
+	img_shape.append(img.shape)
+	if img.shape[0] != 256 or img.shape[1] != 256:
+		img  = cv2.resize(img, (256, 256), \
+			interpolation = cv2.INTER_AREA) #CUBIC for upsample
+	img = img[:, :, :1]
+	x_train.append(img)
+	#Masks
+	img = cv2.imread('../../bucket/masks/' + file_name + '.png')
+	if img.shape[0] != 256 or img.shape[1] != 256:
+		img  = cv2.resize(img, (256, 256), \
+			interpolation = cv2.INTER_AREA)
+	y_train.append(img)
+
+x_train = np.array(x_train)
+y_train = np.array(y_train)
+
+'''
 img_name = '4bad52d5ef5f68e87523ba40aa870494a63c318da7ec7609e486e62f7f7a25e8'
 input_img = cv2.imread('/home/marcus/Desktop/data/' + img_name + '/frame0000.png')
 input_img = input_img[:, :, :1]
 seg_img = cv2.imread('/home/marcus/Desktop/' + img_name + '.png')
 
-x_train = []
 x_train.append(input_img)
 x_train = np.array(x_train)
 
-y_train = []
 y_train.append(seg_img)
 y_train = np.array(y_train)
+'''
 
 model = FCN8(256, 256, 3)
 model.summary()
@@ -119,9 +143,8 @@ model.summary()
 sgd = optimizers.SGD()
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
-model.fit(x_train, y_train, batch_size=1, epochs=20)
-
-model.save('../models/FCN8.h5')
+model.fit(x_train, y_train, batch_size=32, epochs=20)
+model.save('../models/FCN8_Full_First.h5')
 
 pred = model.predict(x_train)
 pred_img = np.argmax(pred, axis=3)
