@@ -7,6 +7,7 @@ import keras
 from keras.models import *
 from keras.layers import *
 from keras import optimizers
+from scipy.ndimage.filters import *
 
 def FCN8(input_height, input_width, n_classes):
 	input_img = Input(shape=(input_height, input_width, 1))
@@ -113,7 +114,11 @@ for file_name in train_names:
 		img  = cv2.resize(img, (256, 256), \
 			interpolation = cv2.INTER_AREA) #CUBIC for upsample
 	img = img[:, :, :1]
-	x_train.append(img)
+	img = median_filter(img, size=3)
+	f = np.fft.fft2(img)
+	fshift = np.fft.fftshift(f)
+	img_magnitude_spectrum = 20 * np.log(np.abs(fshift))
+	x_train.append(img_magnitude_spectrum)
 	#Masks
 	img = cv2.imread('../../bucket/masks/' + file_name + '.png')
 	if img.shape[0] != 256 or img.shape[1] != 256:
