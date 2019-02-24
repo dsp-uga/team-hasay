@@ -124,19 +124,6 @@ for file_name in train_names:
 x_train = np.array(x_train)
 y_train = np.array(y_train)
 
-'''
-img_name = '4bad52d5ef5f68e87523ba40aa870494a63c318da7ec7609e486e62f7f7a25e8'
-input_img = cv2.imread('/home/marcus/Desktop/data/' + img_name + '/frame0000.png')
-input_img = input_img[:, :, :1]
-seg_img = cv2.imread('/home/marcus/Desktop/' + img_name + '.png')
-
-x_train.append(input_img)
-x_train = np.array(x_train)
-
-y_train.append(seg_img)
-y_train = np.array(y_train)
-'''
-
 model = FCN8(256, 256, 3)
 model.summary()
 
