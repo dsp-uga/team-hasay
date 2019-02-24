@@ -8,7 +8,7 @@ from keras.models import *
 from keras.layers import *
 from keras import optimizers
 
-def FCN8(input_height, input_width):
+def FCN8(input_height, input_width, n_classes):
 	input_img = Input(shape=(input_height, input_width, 1))
 	
 	#Block 1
@@ -41,43 +41,60 @@ def FCN8(input_height, input_width):
 	x = Conv2D(256, (3,3), activation='relu', padding='same', \
 		name='block3_conv3', data_format='channels_last')\
 		(x)
-	x = MaxPooling2D((2, 2), strides=(2,2), name='block3_pool', \
+	pool3 = MaxPooling2D((2, 2), strides=(2,2), name='block3_pool', \
 		data_format='channels_last')(x)
 
 	#Block 4
 	x = Conv2D(512, (3,3), activation='relu', padding='same', \
 		name='block4_conv1', data_format='channels_last')\
-		(x)
+		(pool3)
 	x = Conv2D(512, (3,3), activation='relu', padding='same', \
 		name='block4_conv2', data_format='channels_last')\
 		(x)
 	x = Conv2D(512, (3,3), activation='relu', padding='same', \
 		name='block4_conv3', data_format='channels_last')\
 		(x)
-	x = MaxPooling2D((2, 2), strides=(2,2), name='block4_pool', \
+	pool4 = MaxPooling2D((2, 2), strides=(2,2), name='block4_pool', \
 		data_format='channels_last')(x)
 
 	#Block 5
 	x = Conv2D(512, (3,3), activation='relu', padding='same', \
 		name='block5_conv1', data_format='channels_last')\
-		(x)
+		(pool4)
 	x = Conv2D(512, (3,3), activation='relu', padding='same', \
 		name='block5_conv2', data_format='channels_last')\
 		(x)
 	x = Conv2D(512, (3,3), activation='relu', padding='same', \
 		name='block5_conv3', data_format='channels_last')\
 		(x)
-	x = MaxPooling2D((2, 2), strides=(2,2), name='block5_pool', \
+	pool5 = MaxPooling2D((2, 2), strides=(2,2), name='block5_pool', \
 		data_format='channels_last')(x)
 
+	#Deconvolution pool5
 	x = (Conv2D(4096, (8,8), activation='relu', padding='same', \
-		name='conv6', data_format='channels_last'))(x)
+		name='conv6', data_format='channels_last'))(pool5)
 
 	x = (Conv2D(4096, (1,1), activation='relu', padding='same', \
 		name='conv7', data_format='channels_last'))(x)
 
-	#Test
-	x = (Conv2DTranspose(3, kernel_size=(32, 32), strides=(32, 32), \
+	pool5_deconv = (Conv2DTranspose(n_classes, kernel_size=(4, 4),\
+		strides=(4, 4), use_bias=False, \
+		data_format='channels_last'))(x)
+
+	#Deconvolution pool4
+	x = (Conv2D(n_classes, (1,1), activation='relu', padding='same', \
+		name='pool4_filetered', data_format='channels_last'))(pool4)
+	pool4_deconv = (Conv2DTranspose(n_classes, kernel_size=(2, 2),\
+		strides=(2, 2), use_bias=False, \
+		data_format='channels_last'))(x)
+
+	#Layer Fusion
+	pool3_filtered = (Conv2D(n_classes, (1,1), activation='relu', padding='same', \
+		name='pool3_filetered', data_format='channels_last'))(pool3)
+	x = Add(name='layer_fusion')([pool5_deconv, pool4_deconv, pool3_filtered])
+
+	#8 Times Deconvolution and Softmax
+	x = (Conv2DTranspose(n_classes, kernel_size=(8, 8), strides=(8, 8), \
 		use_bias=False, data_format='channels_last'))(x)
 	x = (Activation('softmax'))(x)
 
@@ -88,15 +105,6 @@ input_img = cv2.imread('/home/marcus/Desktop/data/' + img_name + '/frame0000.png
 input_img = input_img[:, :, :1]
 seg_img = cv2.imread('/home/marcus/Desktop/' + img_name + '.png')
 
-'''
-fig = plt.figure(figsize=(5, 5))
-ax = fig.add_subplot(1, 2, 1)
-ax.imshow(input_img)
-ax = fig.add_subplot(1, 2, 2)
-ax.imshow(seg_img)
-#plt.show()
-'''
-
 x_train = []
 x_train.append(input_img)
 x_train = np.array(x_train)
@@ -105,7 +113,7 @@ y_train = []
 y_train.append(seg_img)
 y_train = np.array(y_train)
 
-model = FCN8(256, 256)
+model = FCN8(256, 256, 3)
 model.summary()
 
 sgd = optimizers.SGD()
@@ -116,6 +124,8 @@ model.fit(x_train, y_train, batch_size=1, epochs=20)
 pred = model.predict(x_train)
 pred_img = np.argmax(pred, axis=3)
 fig = plt.figure(figsize=(10, 10))
-ax = fig.add_subplot(111)
+ax = fig.add_subplot(121)
 ax.imshow(pred_img[0])
+ax = fig.add_subplot(122)
+ax.imshow(y_train[0][:, :, 0])
 #plt.show()
