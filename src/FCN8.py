@@ -121,6 +121,8 @@ model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
 model.fit(x_train, y_train, batch_size=1, epochs=20)
 
+model.save('../models/FCN8.h5')
+
 pred = model.predict(x_train)
 pred_img = np.argmax(pred, axis=3)
 fig = plt.figure(figsize=(10, 10))
