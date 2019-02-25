@@ -7,6 +7,7 @@ import keras
 from keras.models import *
 from keras.layers import *
 from keras import optimizers
+from keras.callbacks import *
 from scipy.ndimage.filters import *
 
 def FCN8(input_height, input_width, n_classes):
@@ -101,33 +102,51 @@ def FCN8(input_height, input_width, n_classes):
 
 	return Model(input_img, x)
 
-#Main
-train_names = open('../../bucket/train.txt').read().split()
-x_train = []
-y_train = []
-img_shape = []
-for file_name in train_names:
-	#Train Images
-	img = cv2.imread('../../bucket/data/' + file_name + '/frame0000.png')
-	img_shape.append(img.shape)
-	if img.shape[0] != 256 or img.shape[1] != 256:
-		img  = cv2.resize(img, (256, 256), \
-			interpolation = cv2.INTER_AREA) #CUBIC for upsample
-	img = img[:, :, :1]
-	img = median_filter(img, size=3)
+def load_data():
+	train_names = open('../../bucket/train.txt').read().split()
+	x_train = []
+	y_train = []
+	img_shapes = []
+	for file_name in train_names:
+		img = cv2.imread('../../bucket/data/' + file_name + '/frame0000.png')
+		img_shapes.append(img.shape)
+		if img.shape[0] != 256 or img.shape[1] != 256:
+			img  = cv2.resize(img, (256, 256), \
+				interpolation = cv2.INTER_AREA) #CUBIC for upsample
+		img = median_filter(img, size=3)
+		#img = fourier_transform(img)
+		img = canny(img)
+		#img = laplacian(img)
+		x_train.append(img)
+
+		img = cv2.imread('../../bucket/masks/' + file_name + '.png')
+		if img.shape[0] != 256 or img.shape[1] != 256:
+			img  = cv2.resize(img, (256, 256), \
+				interpolation = cv2.INTER_AREA)
+		y_train.append(img)
+
+	x_train = np.array(x_train)
+	y_train = np.array(y_train)
+	return x_train, y_train, img_shapes
+	
+
+def fourier_transform(img):
 	f = np.fft.fft2(img)
 	fshift = np.fft.fftshift(f)
 	img_magnitude_spectrum = 20 * np.log(np.abs(fshift))
-	x_train.append(img_magnitude_spectrum)
-	#Masks
-	img = cv2.imread('../../bucket/masks/' + file_name + '.png')
-	if img.shape[0] != 256 or img.shape[1] != 256:
-		img  = cv2.resize(img, (256, 256), \
-			interpolation = cv2.INTER_AREA)
-	y_train.append(img)
+	return img_magnitude
 
-x_train = np.array(x_train)
-y_train = np.array(y_train)
+def laplacian(img):
+	laplacian = cv2.Laplacian(img, cv2.CV_64F)
+	laplacian = laplacian[:, :, :1]
+	return laplacian
+
+def canny(img):
+	canny = cv2.Canny(img, 100, 200)
+	return np.expand_dims(canny, axis=2)
+
+#Main
+x_train, y_train, img_shapes = load_data()
 
 model = FCN8(256, 256, 3)
 model.summary()
@@ -135,8 +154,8 @@ model.summary()
 sgd = optimizers.SGD()
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
-model.fit(x_train, y_train, batch_size=32, epochs=20)
-model.save('../models/FCN8_Full_First.h5')
+model.fit(x_train, y_train, batch_size=32, epochs=2)
+#model.save('../models/FCN8_Full_First.h5')
 
 pred = model.predict(x_train)
 pred_img = np.argmax(pred, axis=3)
