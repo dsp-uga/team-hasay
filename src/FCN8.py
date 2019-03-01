@@ -107,7 +107,7 @@ def fourier_transform(img):
 	f = np.fft.fft2(img)
 	fshift = np.fft.fftshift(f)
 	img_magnitude_spectrum = 20 * np.log(np.abs(fshift))
-	return img_magnitude
+	return img_magnitude_spectrum
 
 def laplacian(img):
 	laplacian = cv2.Laplacian(img, cv2.CV_64F)
@@ -137,7 +137,7 @@ def load_training_data():
 		img = cv2.imread('../frames/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
-				interpolation = cv2.INTER_AREA) #CUBIC for upsample
+				interpolation = cv2.INTER_AREA)
 		img = median_filter(img, size=3)
 		img = normalize(img)
 		#img = fourier_transform(img)
@@ -184,36 +184,27 @@ x_test, img_shapes, test_names = load_testing_data()
 model = FCN8(256, 256, 3)
 model.summary()
 
-rmsprop = optimizers.RMSprop()
-sgd = optimizers.SGD(lr=0.3, decay=5**(-4), momentum=0.9, nesterov=True)
+sgd = optimizers.SGD(lr=0.4, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
 
-callbacks=[ModelCheckpoint(filepath='../models/Norm_Threshold_200.h5', \
+model_path = '../models/Best_Norm_Threshold_200.h5'
+callbacks=[ModelCheckpoint(filepath=model_path, \
 		monitor='val_loss', save_best_only=True)]
 model.fit(x_train, y_train, batch_size=32, epochs=200, validation_split=0.1, callbacks=callbacks)
-#model.save('../models/FCN8_Thresholded_200.h5')
+model.save('../models/Full_Norm_Threshold_200.h5')
 
 pred = model.predict(x_test)
 pred_imgs = np.argmax(pred, axis=3)
-'''
-results = []
-for i in range(len(pred_imgs)):
-	img = cv2.resize(pred_imgs[i], \
-		(img_shapes[i][1], img_shapes[i][0]), \
-		interpolation=cv2.INTER_CUBIC)
-	results.append(img)
-'''
-for i in range(len(pred_imgs)):
-	cv2.imwrite('../predictions/outputs/' \
-			+ test_names[i] \
-			+ '.png', pred_imgs[i])
 
+#Work-around to resize and save images, due to cv2 bug
 for i in range(len(pred_imgs)):
-	if img_shapes[i][0] != 256 or img_shapes[i][1] != 256:
-		img = cv2.imread('../predictions/outputs/' \
+	output_path = '../predictions/outputs/' \
 			+ test_names[i] \
-			+ '.png')
+			+ '.png'
+	cv2.imwrite(output_path, pred_imgs[i])
+	if img_shapes[i][0] != 256 or img_shapes[i][1] != 256:
+		img = cv2.imread(output_path)
 		img = img[:,:,0]
 		img = cv2.resize(img, \
 			(img_shapes[i][1], img_shapes[i][0]), \
