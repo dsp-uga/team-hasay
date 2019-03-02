@@ -134,16 +134,12 @@ def load_training_data():
 	y_train = []
 	n_classes = 3
 	for file_name in train_names:
-		#img = cv2.imread('../frames/' + file_name + '.png')
 		img = cv2.imread('../frames_one_std/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
 		img = median_filter(img, size=3)
 		img = normalize(img)
-		#img = fourier_transform(img)
-		#img = canny(img)
-		#img = laplacian(img)
 		x_train.append(img)
 		img = cv2.imread('../../bucket/masks/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
@@ -164,7 +160,6 @@ def load_testing_data():
 	img_shapes = []
 	n_classes = 3
 	for file_name in test_names:
-		#img = cv2.imread('../frames/' + file_name + '.png')
 		img = cv2.imread('../frames_one_std/' + file_name + '.png')
 		img_shapes.append(img.shape)
 		if img.shape[0] != 256 or img.shape[1] != 256:
@@ -172,9 +167,6 @@ def load_testing_data():
 				interpolation = cv2.INTER_AREA)
 		img = median_filter(img, size=3)
 		img = normalize(img)
-		#img = fourier_transform(img)
-		#img = canny(img)
-		#img = laplacian(img)
 		x_test.append(img)
 	x_test = np.array(x_test)
 	return x_test, img_shapes, test_names
@@ -186,7 +178,7 @@ x_test, img_shapes, test_names = load_testing_data()
 model = FCN8(256, 256, 3)
 model.summary()
 
-sgd = optimizers.SGD(lr=0.1, decay=5**(-4), momentum=0.9, nesterov=True)
+sgd = optimizers.SGD(lr=0.3, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
 
