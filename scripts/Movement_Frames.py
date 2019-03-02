@@ -14,9 +14,10 @@ for file_name in file_names:
 	col = img.shape[1]
 	variance = np.load(variances_path + file_name + '.npy')
 	mean_variance = np.mean(variance)
+	std = np.std(variance)
 	for i in range(row):
 		for j in range(col):
-			if variance[i][j] < mean_variance:
+			if variance[i][j] < mean_variance + std:
 				img[i][j][0] = 0
 	img = img[:,:,0]
-	cv2.imwrite('../frames/' + file_name + '.png', img)
+	cv2.imwrite('../frames_one_std/' + file_name + '.png', img)

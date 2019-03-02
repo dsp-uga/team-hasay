@@ -134,7 +134,8 @@ def load_training_data():
 	y_train = []
 	n_classes = 3
 	for file_name in train_names:
-		img = cv2.imread('../frames/' + file_name + '.png')
+		#img = cv2.imread('../frames/' + file_name + '.png')
+		img = cv2.imread('../frames_one_std/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
@@ -163,7 +164,8 @@ def load_testing_data():
 	img_shapes = []
 	n_classes = 3
 	for file_name in test_names:
-		img = cv2.imread('../frames/' + file_name + '.png')
+		#img = cv2.imread('../frames/' + file_name + '.png')
+		img = cv2.imread('../frames_one_std/' + file_name + '.png')
 		img_shapes.append(img.shape)
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
@@ -184,22 +186,23 @@ x_test, img_shapes, test_names = load_testing_data()
 model = FCN8(256, 256, 3)
 model.summary()
 
-sgd = optimizers.SGD(lr=0.4, decay=5**(-4), momentum=0.9, nesterov=True)
+sgd = optimizers.SGD(lr=0.1, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
 
-model_path = '../models/Best_Norm_Threshold_200.h5'
+model_path = '../models/Best_Norm_One_STD.h5'
 callbacks=[ModelCheckpoint(filepath=model_path, \
 		monitor='val_loss', save_best_only=True)]
 model.fit(x_train, y_train, batch_size=32, epochs=200, validation_split=0.1, callbacks=callbacks)
-model.save('../models/Full_Norm_Threshold_200.h5')
+model.save('../models/Full_Norm_One_STD.h5')
 
+#Full
 pred = model.predict(x_test)
 pred_imgs = np.argmax(pred, axis=3)
 
 #Work-around to resize and save images, due to cv2 bug
 for i in range(len(pred_imgs)):
-	output_path = '../predictions/outputs/' \
+	output_path = '../predictions/full_outputs/' \
 			+ test_names[i] \
 			+ '.png'
 	cv2.imwrite(output_path, pred_imgs[i])
@@ -209,6 +212,23 @@ for i in range(len(pred_imgs)):
 		img = cv2.resize(img, \
 			(img_shapes[i][1], img_shapes[i][0]), \
 			interpolation=cv2.INTER_CUBIC)
-		cv2.imwrite('../predictions/outputs/' \
+		cv2.imwrite(output_path, img)
+
+#Best Val_loss
+model = keras.models.load_model(model_path)
+pred = model.predict(x_test)
+pred_imgs = np.argmax(pred, axis=3)
+
+for i in range(len(pred_imgs)):
+	output_path = '../predictions/best_outputs/' \
 			+ test_names[i] \
-			+ '.png', img)
+			+ '.png'
+	cv2.imwrite(output_path, pred_imgs[i])
+	if img_shapes[i][0] != 256 or img_shapes[i][1] != 256:
+		img = cv2.imread(output_path)
+		img = img[:,:,0]
+		img = cv2.resize(img, \
+			(img_shapes[i][1], img_shapes[i][0]), \
+			interpolation=cv2.INTER_CUBIC)
+		cv2.imwrite(output_path, img)
+
