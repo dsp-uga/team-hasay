@@ -59,3 +59,29 @@ def unet(input_height, input_width, n_classes):
     model = Model(input = inputs, output = conv10)
 
     return model
+    
+    
+def fourier_transform(img):
+    f = np.fft.fft2(img)
+    fshift = np.fft.fftshift(f)
+    img_magnitude_spectrum = 20 * np.log(np.abs(fshift))
+    return img_magnitude_spectrum
+
+def laplacian(img):
+    laplacian = cv2.Laplacian(img, cv2.CV_64F)
+    #laplacian = laplacian[:, :, :1]
+    return laplacian
+
+def canny(img):
+    canny = cv2.Canny(img, 100, 200)
+    return np.expand_dims(canny, axis=2)
+
+def normalize(img):
+    mean = np.mean(img)
+    std = np.std(img)
+    row = img.shape[0]
+    col = img.shape[1]
+    for i in range(row):
+        for j in range(col):
+            img[i][j][0] = (img[i][j][0] - mean) / std
+    return img[:, :, :1]
