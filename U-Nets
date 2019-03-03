@@ -85,3 +85,43 @@ def normalize(img):
         for j in range(col):
             img[i][j][0] = (img[i][j][0] - mean) / std
     return img[:, :, :1]
+    
+def load_training_data():
+    train_names = open('C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//team-hasay-master//train.txt').read().split()
+    x_train = []
+    y_train = []
+    n_classes = 3
+    for file_name in train_names:
+        img = cv2.imread('C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//team-hasay-master//frames//' + file_name + '.png')
+        if img.shape[0] != 256 or img.shape[1] != 256:
+            img  = cv2.resize(img, (256, 256), interpolation = cv2.INTER_AREA)
+        img = median_filter(img, size=3)
+        img = normalize(img)
+        x_train.append(img)
+        img = cv2.imread('C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//team-hasay-master//masks//'  + file_name + '.png')
+        if img.shape[0] != 256 or img.shape[1] != 256:
+            img  = cv2.resize(img, (256, 256), interpolation = cv2.INTER_AREA)
+        img = img[:,:,0]
+        seg_mask = np.zeros((img.shape[0], img.shape[1], n_classes))
+        for label in range(n_classes):
+            seg_mask[:,:,label] = (img == label).astype(int)
+        y_train.append(seg_mask)
+    x_train = np.array(x_train)
+    y_train = np.array(y_train)
+    return x_train, y_train
+
+def load_testing_data():
+    test_names = open('C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//team-hasay-master//test.txt').read().split()
+    x_test = []
+    img_shapes = []
+    n_classes = 3
+    for file_name in test_names:
+        img = cv2.imread('C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//team-hasay-FCN//frames_one_std//' + file_name + '.png')
+        img_shapes.append(img.shape)
+        if img.shape[0] != 256 or img.shape[1] != 256:
+            img  = cv2.resize(img, (256, 256), interpolation = cv2.INTER_AREA)
+        img = median_filter(img, size=3)
+        img = normalize(img)
+        x_test.append(img)
+    x_test = np.array(x_test)
+    return x_test, img_shapes, test_names
