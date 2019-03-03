@@ -107,11 +107,10 @@ def fourier_transform(img):
 	f = np.fft.fft2(img)
 	fshift = np.fft.fftshift(f)
 	img_magnitude_spectrum = 20 * np.log(np.abs(fshift))
-	return img_magnitude
+	return img_magnitude_spectrum
 
 def laplacian(img):
 	laplacian = cv2.Laplacian(img, cv2.CV_64F)
-	#laplacian = laplacian[:, :, :1]
 	return laplacian
 
 def canny(img):
@@ -128,25 +127,19 @@ def normalize(img):
 			img[i][j][0] = (img[i][j][0] - mean) / std
 	return img[:, :, :1]
 
-def load_data():
+def load_training_data():
 	train_names = open('../../bucket/train.txt').read().split()
 	x_train = []
 	y_train = []
-	img_shapes = []
 	n_classes = 3
 	for file_name in train_names:
-		img = cv2.imread('../frames/' + file_name + '.png')
-		img_shapes.append(img.shape)
+		img = cv2.imread('../frames_one_std/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
-				interpolation = cv2.INTER_AREA) #CUBIC for upsample
+				interpolation = cv2.INTER_AREA)
 		img = median_filter(img, size=3)
 		img = normalize(img)
-		#img = fourier_transform(img)
-		#img = canny(img)
-		#img = laplacian(img)
 		x_train.append(img)
-
 		img = cv2.imread('../../bucket/masks/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
@@ -156,29 +149,76 @@ def load_data():
 		for label in range(n_classes):
 			seg_mask[:,:,label] = (img == label).astype(int)
 		y_train.append(seg_mask)
-
 	x_train = np.array(x_train)
 	y_train = np.array(y_train)
-	return x_train, y_train, img_shapes
+	return x_train, y_train
+
+def load_testing_data():
+	test_names = open('../../bucket/test.txt').read().split()
+	x_test = []
+	img_shapes = []
+	n_classes = 3
+	for file_name in test_names:
+		img = cv2.imread('../frames_one_std/' + file_name + '.png')
+		img_shapes.append(img.shape)
+		if img.shape[0] != 256 or img.shape[1] != 256:
+			img  = cv2.resize(img, (256, 256), \
+				interpolation = cv2.INTER_AREA)
+		img = median_filter(img, size=3)
+		img = normalize(img)
+		x_test.append(img)
+	x_test = np.array(x_test)
+	return x_test, img_shapes, test_names
 	
 #Main
-x_train, y_train, img_shapes = load_data()
+x_train, y_train = load_training_data()
+x_test, img_shapes, test_names = load_testing_data()
 
 model = FCN8(256, 256, 3)
 model.summary()
 
-rmsprop = optimizers.RMSprop()
-sgd = optimizers.SGD(lr=0.01, decay=5**(-4), momentum=0.9, nesterov=True)
+sgd = optimizers.SGD(lr=0.3, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
-model.fit(x_train, y_train, batch_size=32, epochs=5)
-model.save('../models/FCN8_Thresholded_200.h5')
 
-pred = model.predict(x_train)
-pred_img = np.argmax(pred, axis=3)
-fig = plt.figure(figsize=(10, 10))
-ax = fig.add_subplot(121)
-ax.imshow(pred_img[0])
-ax = fig.add_subplot(122)
-ax.imshow(y_train[0][:, :, 0])
-#plt.show()
+model_path = '../models/Best_Norm_Two_STD.h5'
+callbacks=[ModelCheckpoint(filepath=model_path, \
+		monitor='val_loss', save_best_only=True)]
+model.fit(x_train, y_train, batch_size=32, epochs=200, validation_split=0.1, callbacks=callbacks)
+model.save('../models/Full_Norm_Two_STD.h5')
+
+#Full
+pred = model.predict(x_test)
+pred_imgs = np.argmax(pred, axis=3)
+
+#Work-around to resize and save images, due to cv2 bug
+for i in range(len(pred_imgs)):
+	output_path = '../predictions/full_outputs/' \
+			+ test_names[i] \
+			+ '.png'
+	cv2.imwrite(output_path, pred_imgs[i])
+	if img_shapes[i][0] != 256 or img_shapes[i][1] != 256:
+		img = cv2.imread(output_path)
+		img = img[:,:,0]
+		img = cv2.resize(img, \
+			(img_shapes[i][1], img_shapes[i][0]), \
+			interpolation=cv2.INTER_CUBIC)
+		cv2.imwrite(output_path, img)
+
+#Best Val_loss
+model = keras.models.load_model(model_path)
+pred = model.predict(x_test)
+pred_imgs = np.argmax(pred, axis=3)
+
+for i in range(len(pred_imgs)):
+	output_path = '../predictions/best_outputs/' \
+			+ test_names[i] \
+			+ '.png'
+	cv2.imwrite(output_path, pred_imgs[i])
+	if img_shapes[i][0] != 256 or img_shapes[i][1] != 256:
+		img = cv2.imread(output_path)
+		img = img[:,:,0]
+		img = cv2.resize(img, \
+			(img_shapes[i][1], img_shapes[i][0]), \
+			interpolation=cv2.INTER_CUBIC)
+		cv2.imwrite(output_path, img)
