@@ -138,7 +138,6 @@ def load_training_data():
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
 		img = median_filter(img, size=3)
-		#img = canny(img)
 		img = normalize(img)
 		x_train.append(img)
 		img = cv2.imread('../../bucket/masks/' + file_name + '.png')
@@ -166,7 +165,6 @@ def load_testing_data():
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
 		img = median_filter(img, size=3)
-		#img = canny(img)
 		img = normalize(img)
 		x_test.append(img)
 	x_test = np.array(x_test)
