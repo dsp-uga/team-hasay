@@ -20,4 +20,4 @@ for file_name in file_names:
 			if variance[i][j] < mean_variance + std:
 				img[i][j][0] = 0
 	img = img[:,:,0]
-	cv2.imwrite('../frames_one_std/' + file_name + '.png', img)
+	cv2.imwrite('../frames_three_std/' + file_name + '.png', img)

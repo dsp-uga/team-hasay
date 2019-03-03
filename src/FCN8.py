@@ -111,7 +111,6 @@ def fourier_transform(img):
 
 def laplacian(img):
 	laplacian = cv2.Laplacian(img, cv2.CV_64F)
-	#laplacian = laplacian[:, :, :1]
 	return laplacian
 
 def canny(img):
@@ -139,6 +138,7 @@ def load_training_data():
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
 		img = median_filter(img, size=3)
+		#img = canny(img)
 		img = normalize(img)
 		x_train.append(img)
 		img = cv2.imread('../../bucket/masks/' + file_name + '.png')
@@ -166,6 +166,7 @@ def load_testing_data():
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
 		img = median_filter(img, size=3)
+		#img = canny(img)
 		img = normalize(img)
 		x_test.append(img)
 	x_test = np.array(x_test)
@@ -182,11 +183,11 @@ sgd = optimizers.SGD(lr=0.3, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
 
-model_path = '../models/Best_Norm_One_STD.h5'
+model_path = '../models/Best_Norm_Two_STD.h5'
 callbacks=[ModelCheckpoint(filepath=model_path, \
 		monitor='val_loss', save_best_only=True)]
 model.fit(x_train, y_train, batch_size=32, epochs=200, validation_split=0.1, callbacks=callbacks)
-model.save('../models/Full_Norm_One_STD.h5')
+model.save('../models/Full_Norm_Two_STD.h5')
 
 #Full
 pred = model.predict(x_test)
