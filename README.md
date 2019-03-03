@@ -1,5 +1,7 @@
 # team-hasay
 
+This repo consists of several efforts to tackle Cilia Segmentation.
+
 References:
 
 	FCN Paper
@@ -15,3 +17,4 @@ References:
 		the VCG pre-trained weights to aid the learning process, like their modeld did.
 
 	OpenCV Fourier Transform: https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_transforms/py_fourier_transform/py_fourier_transform.html
+

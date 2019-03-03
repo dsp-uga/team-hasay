@@ -222,4 +222,3 @@ for i in range(len(pred_imgs)):
 			(img_shapes[i][1], img_shapes[i][0]), \
 			interpolation=cv2.INTER_CUBIC)
 		cv2.imwrite(output_path, img)
-
