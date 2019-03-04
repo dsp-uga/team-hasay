@@ -125,3 +125,17 @@ def load_testing_data():
         x_test.append(img)
     x_test = np.array(x_test)
     return x_test, img_shapes, test_names
+    
+x_train, y_train = load_training_data()
+x_test, img_shapes, test_names = load_testing_data()
+
+model = unet(256, 256, 3)
+model.summary()
+
+sgd = optimizers.SGD(lr=0.3, decay=5**(-4), momentum=0.9, nesterov=True)
+model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+
+model_path = 'C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//models//Best_Norm_One_STD.h5'
+callbacks=[ModelCheckpoint(filepath=model_path, monitor='val_loss', save_best_only=True)]
+model.fit(x_train, y_train, batch_size=2, epochs=10, validation_split=0.1, callbacks=callbacks)
+model.save('C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//models//Full_Norm_One_STD.h5')
