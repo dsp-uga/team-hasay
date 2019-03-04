@@ -3,8 +3,8 @@ import os
 from keras.models import * 
 from keras.layers import *
 from keras.optimizers import *
-import skimage.io as io
-import skimage.transform as tr
+import cv2
+import matplotlib.pyplot as plt
 
 def unet(input_height, input_width, n_classes):
     input = Input(shape=(input_height, input_width, n_classes))
@@ -139,3 +139,17 @@ model_path = 'C://Users//dhava//Desktop//My Courses//Data Science Practicum//Pro
 callbacks=[ModelCheckpoint(filepath=model_path, monitor='val_loss', save_best_only=True)]
 model.fit(x_train, y_train, batch_size=2, epochs=10, validation_split=0.1, callbacks=callbacks)
 model.save('C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//models//Full_Norm_One_STD.h5')
+
+#Full
+pred = model.predict(x_test)
+pred_imgs = np.argmax(pred, axis=3)
+
+#Work-around to resize and save images, due to cv2 bug
+for i in range(len(pred_imgs)):
+    output_path = 'C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//predictions//full_outputs//' + test_names[i] + '.png'
+    cv2.imwrite(output_path, pred_imgs[i])
+    if img_shapes[i][0] != 256 or img_shapes[i][1] != 256:
+        img = cv2.imread(output_path)
+        img = img[:,:,0]
+        img = cv2.resize(img, (img_shapes[i][1], img_shapes[i][0]), interpolation=cv2.INTER_CUBIC)
+        cv2.imwrite(output_path, img)
