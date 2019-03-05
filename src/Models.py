@@ -103,6 +103,59 @@ def FCN8(input_height, input_width, n_classes):
 
 	return Model(input_img, x)
 
+def unet(input_height, input_width, n_classes):
+    inputs = Input(shape=(input_height, input_width, 1))
+    
+    conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', data_format='channels_last')(inputs)
+    conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv1)
+    pool1 = MaxPooling2D(strides=(2,2))(conv1)
+
+    conv2 = Conv2D(128, 3, activation = 'relu', padding = 'same', data_format='channels_last')(pool1)
+    conv2 = Conv2D(128, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv2)
+    pool2 = MaxPooling2D(strides=(2, 2))(conv2)
+
+    conv3 = Conv2D(256, 3, activation = 'relu', padding = 'same', data_format='channels_last')(pool2)
+    conv3 = Conv2D(256, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv3)
+    pool3 = MaxPooling2D(strides=(2, 2))(conv3)
+
+    conv4 = Conv2D(512, 3, activation = 'relu', padding = 'same', data_format='channels_last')(pool3)
+    conv4 = Conv2D(512, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv4)
+    drop4 = Dropout(0.5)(conv4)
+    pool4 = MaxPooling2D(strides=(2, 2))(drop4)
+
+    conv5 = Conv2D(1024, 3, activation = 'relu', padding = 'same', data_format='channels_last')(pool4)
+    conv5 = Conv2D(1024, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv5)
+    drop5 = Dropout(0.5)(conv5)
+
+    up6 = Conv2D(512, 2, activation = 'relu', padding = 'same', data_format='channels_last')(UpSampling2D(size = (2,2))(drop5))
+    #up6 = Cropping2D(cropping = ((1,0), (0,0)))(up6)
+    #merge6 = concatenate([drop4,up6], axis = 3)
+    merge6 = Add(name='layer_fusion1')([drop4, up6])
+    conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', data_format='channels_last')(merge6)
+    conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv6)
+
+    up7 = Conv2D(256, 2, activation = 'relu', padding = 'same', data_format='channels_last')(UpSampling2D(size = (2,2))(conv6))
+    #merge7 = concatenate([conv3,up7], axis = 3)
+    merge7 = Add(name='layer_fusion2')([conv3, up7])
+    conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', data_format='channels_last')(merge7)
+    conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv7)
+
+    up8 = Conv2D(128, 2, activation = 'relu', padding = 'same', data_format='channels_last')(UpSampling2D(size = (2,2))(conv7))
+    #merge8 = concatenate([conv2,up8], axis = 3)
+    merge8 = Add(name='layer_fusion3')([conv2, up8])
+    conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', data_format='channels_last')(merge8)
+    conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv8)
+
+    up9 = Conv2D(64, 2, activation = 'relu', padding = 'same', data_format='channels_last')(UpSampling2D(size = (2,2))(conv8))
+    #merge9 = concatenate([conv1,up9], axis = 3)
+    merge9 = Add(name='layer_fusion4')([conv1, up9])
+    conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', data_format='channels_last')(merge9)
+    conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv9)
+    conv9 = Conv2D(3, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv9)
+
+    output = (Activation('softmax'))(conv9)
+    return Model(inputs, output)
+
 def fourier_transform(img):
 	f = np.fft.fft2(img)
 	fshift = np.fft.fftshift(f)
@@ -134,6 +187,7 @@ def load_training_data():
 	n_classes = 3
 	for file_name in train_names:
 		img = cv2.imread('../frames_one_std/' + file_name + '.png')
+		#img = cv2.imread('../frames_smoothed_one_std/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
@@ -160,6 +214,7 @@ def load_testing_data():
 	n_classes = 3
 	for file_name in test_names:
 		img = cv2.imread('../frames_one_std/' + file_name + '.png')
+		#img = cv2.imread('../frames_smoothed_one_std/' + file_name + '.png')
 		img_shapes.append(img.shape)
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
@@ -174,18 +229,19 @@ def load_testing_data():
 x_train, y_train = load_training_data()
 x_test, img_shapes, test_names = load_testing_data()
 
-model = FCN8(256, 256, 3)
+#model = FCN8(256, 256, 3)
+model = unet(256, 256, 3)
 model.summary()
 
-sgd = optimizers.SGD(lr=0.3, decay=5**(-4), momentum=0.9, nesterov=True)
+sgd = optimizers.SGD(lr=0.01, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
 
-model_path = '../models/Best_Norm_Two_STD.h5'
+model_path = '../models/Current_Best.h5'
 callbacks=[ModelCheckpoint(filepath=model_path, \
 		monitor='val_loss', save_best_only=True)]
-model.fit(x_train, y_train, batch_size=32, epochs=200, validation_split=0.1, callbacks=callbacks)
-model.save('../models/Full_Norm_Two_STD.h5')
+model.fit(x_train, y_train, batch_size=8, epochs=200, validation_split=0.1, callbacks=callbacks)
+model.save('../models/Full.h5')
 
 #Full
 pred = model.predict(x_test)
