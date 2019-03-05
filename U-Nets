@@ -153,3 +153,20 @@ for i in range(len(pred_imgs)):
         img = img[:,:,0]
         img = cv2.resize(img, (img_shapes[i][1], img_shapes[i][0]), interpolation=cv2.INTER_CUBIC)
         cv2.imwrite(output_path, img)
+        
+model_path = 'C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//models//Best_Norm_One_STD.h5'
+#Best Val_loss
+model = load_model(model_path)
+pred = model.predict(x_test)
+print(np.unique(pred_imgs))
+pred_imgs = np.argmax(pred, axis=3)
+print(np.unique(pred_imgs))
+
+for i in range(len(pred_imgs)):
+    output_path = 'C://Users//dhava//Desktop//My Courses//Data Science Practicum//Problem2//predictions//best_outputs//' + test_names[i] + '.png'
+    cv2.imwrite(output_path, pred_imgs[i])
+    if img_shapes[i][0] != 256 or img_shapes[i][1] != 256:
+        img = cv2.imread(output_path)
+        img = img[:,:,0]
+        img = cv2.resize(img, (img_shapes[i][1], img_shapes[i][0]), interpolation=cv2.INTER_CUBIC)
+        cv2.imwrite(output_path, img)
