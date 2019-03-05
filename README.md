@@ -1,6 +1,10 @@
 # team-hasay
 
-This repo consists of several efforts to tackle Cilia Segmentation.
+This repo consists of several efforts to tackle Cilia Segmentation. 
+
+Connecting the ciliary motion with clinical phenotypes is an active area of research. This project is about to design an algorithm to segment the cilia. The Cilias are microscopic hairlike structures that protrude from every cell in your body. They beat in regular, rhythmic patterns to perform number of tasks like, from moving nutrients in to moving irritants out to amplifying cell-cell signaling pathways to generating calcium fluid flow in early cell differentiation. Cilia and their beating patterns, are increasingly being implicated in a wide variety of syndromes that affected multiple organs.
+
+##Prerequisites
 
 References:
 
