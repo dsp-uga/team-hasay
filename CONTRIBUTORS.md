@@ -7,3 +7,7 @@
 
 
 ## Denish Khetan
+
+- WiKi
+- Readme
+- Presentation
