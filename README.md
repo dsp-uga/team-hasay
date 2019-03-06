@@ -28,26 +28,27 @@ Download and install Anaconda from (https://www.anaconda.com/distribution/#downl
 ### Running Environment
 
 •	Once Anaconda is installed, open anaconda prompt using windows command Line.\
-•	Run conda env create -f environment.yml will install all packages required for all programs in this repository
+•	Run ```conda env create -f environment.yml``` will install all packages required for all programs in this repository.
 
 ### To start the environment 
 
-•	For PC like systems activate P2-theano
-•	For Unix like systems source activate P2-theano
+•	For PC like systems ```activate P2-theano```
+•	For Unix like systems ```source activate P2-theano```
 
 ## Keras 
 
-Keras is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano. You can install keras using pip on command line sudo pip install keras.
+Keras is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano. You can install keras using pip on command line ```sudo pip install keras```.
 
 ## Tensorflow 
 
-You can install Tensorflow using pip on command line, for CPU sudo pip install tensorflow and for GPU sudo pip install tensorflow-gpu
+You can install Tensorflow using pip on command line, for CPU ```sudo pip install tensorflow``` and for GPU ```sudo pip install tensorflow-gpu```
 
 ## Data 
 
-The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wikipedia.org/wiki/Differential_interference_contrast_microscopy) of cilia biopsies [published in this 2015 study.](http://stm.sciencemag.org/content/7/299/299ra124) For each video, you are provided 100 subsequent frames, which is roughly equal to about 0.5 seconds of real-time video (the framerate of each video is 200 fps). Since the videos are grayscale, if you read a single frame in and notice its data structure contains three color channels, you can safely pick one and drop the other two. Same goes for the masks. Speaking of the masks: each mask is the same spatial dimensions (height, width) as the corresponding video. Each pixel, however, is colored according to what it contains in the video:
-•	2 corresponds to cilia (what you want to predict!)
-•	1 corresponds to a cell
+The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wikipedia.org/wiki/Differential_interference_contrast_microscopy) of cilia biopsies [published in this 2015 study.](http://stm.sciencemag.org/content/7/299/299ra124) For each video, you are provided 100 subsequent frames, which is roughly equal to about 0.5 seconds of real-time video (the framerate of each video is 200 fps). Since the videos are grayscale, if you read a single frame in and notice its data structure contains three color channels, you can safely pick one and drop the other two. Same goes for the masks. Speaking of the masks: each mask is the same spatial dimensions (height, width) as the corresponding video. Each pixel, however, is colored according to what it contains in the video:\
+
+•	2 corresponds to cilia (what you want to predict!)\
+•	1 corresponds to a cell\
 •	0 corresponds to background (neither a cell nor cilia)
 
 ## Results 
@@ -55,7 +56,7 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 | Method |     Configuration    | Accuracy |     Personnel    |
 |--------|----------------------|----------|------------------|
 |  FCN   | #epoch:,#batch:      |          |                  |
-|  U-Net | #epoch:200, #batch:8 |          | [Daval Bhandari](https://github.com/dvlbhanderi)|
+|  U-Net | #epoch:200, #batch:8 |          | [Dhaval Bhanderi](https://github.com/dvlbhanderi)|
 
 ### References:
 
