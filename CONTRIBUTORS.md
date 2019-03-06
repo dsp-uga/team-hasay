@@ -7,8 +7,7 @@
 
 - Implemented U-Net
 - Implementation with Markov Random Field
-- Contributed for Readme
-- Contributed for wiki
+- Contributed for Readme and wiki
 
 
 ## Denish Khetan
