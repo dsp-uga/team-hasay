@@ -1,7 +1,4 @@
 ## Marcus Hill
-- Implemented FCN
-- Created thresholded images using pixel variances
-
 - Implemented Preprocessing
 - Implemented FCN
 
