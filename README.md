@@ -66,8 +66,7 @@ Inside the scripts directory, three python files exist to illustrate the steps t
 - Movement_Frames.py applied thresholding to the first frame of each video based on the variances created using Variances.py.
 
 ## Model Usage
-In order to recreate our results, inside the src directory run the command "python Models.py". By default the U-Net model will be
-ran.
+In order to recreate our results, inside the src directory run the command "python Models.py". By default the U-Net model will run.
 
 ## Results 
 
