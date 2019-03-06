@@ -19,7 +19,7 @@ Follow the below steps for installation and to run the training and testing sets
 
 ## Installation
 
-### Anaconda 
+## Anaconda 
 
 Anaconda is a free and open-source distribution of the Python and R programming languages for scientific computing, that aims to simplify package management and deployment.
 
@@ -35,11 +35,11 @@ Download and install Anaconda from (https://www.anaconda.com/distribution/#downl
 •	For PC like systems ```activate P2-theano```\
 •	For Unix like systems ```source activate P2-theano```
 
-### Keras 
+## Keras 
 
 Keras is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano. You can install keras using pip on command line ```sudo pip install keras```.
 
-### Tensorflow 
+## Tensorflow 
 
 You can install Tensorflow using pip on command line, for CPU ```sudo pip install tensorflow``` and for GPU ```sudo pip install tensorflow-gpu```
 
@@ -51,32 +51,44 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 •	1 corresponds to a cell\
 •	0 corresponds to background (neither a cell nor cilia)
 
+The actual input to our models are located in the ./data/frames_one_std subdirectory. The images in that directory are the result of
+calculating the variance of each pixel for every video, and removing pixels intensities whose variance fell below a threshold. 
+We assumed the pixel variances adhered to a normal(Gaussian) distribution, and because of such we set our threshold value to the mean 
+of the variances plus one standard deviation. The purpose was so that only the top 32% of pixel varainces, hopefully majority cilia,
+would remain. We also tested thresholding with the mean plus two and three standard deviations, but recognized too much information
+was lost to be effective.
+
+## Scripts
+Inside the scripts directory, three python files exist to illustrate the steps taken to pre-process the raw video frames.
+
+- Untar.py simply extracted the contents of each video tar file.
+- Variance.py  computed the variance for each pixel, based on the pixel intensity fluctations between frames.
+- Movement_Frames.py applied thresholding to the first frame of each video based on the variances created using Variances.py.
+
+## Model Usage
+In order to recreate our results, inside the src directory run the command "python Models.py". By default the U-Net model will run.
+
 ## Results 
 
-| Method |     Configuration    | Accuracy |     Personnel    |
+| Method |     Configuration    |   IOU    |     Personnel    |
 |--------|----------------------|----------|------------------|
-|  FCN   | #epoch:200,#batch:32      |   30.26       |   [Marcus Hill](https://github.com/Tallcus)               |
-|  U-Net | #epoch:200, #batch:8 |   31.91       | [Dhaval Bhanderi](https://github.com/dvlbhanderi)|
+|  FCN   | epochs:200, batch:32 |   30.7   | [Marcus Hill](https://github.com/Tallcus)    |
+|  U-Net | epochs:200, batch: 8 |   31.9   | [Dhaval Bhanderi](https://github.com/dvlbhanderi)|
 |  MRF   |        -             | Not completed | [Dhaval Bhanderi](https://github.com/dvlbhanderi)
+
 ### References:
 
-	[FCN Paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
+- [FCN Paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
+- [U-Net Paper](https://arxiv.org/pdf/1505.04597.pdf)
+- https://fairyonice.github.io/Learn-about-Fully-Convolutional-Networks-for-semantic-segmentation.html
 
-	[U-Net Paper](https://arxiv.org/pdf/1505.04597.pdf)
+This paper was a major help in learning how to implement complex neural network sturctures in Keras using,
+the functional API. The model architecture and the y_train mask segementation code are the main areas that
+our code will resemble that found on this webpage. Changes that we made to edit this code is  
+changing the default dimensions of the model input image, and subsequently change the dimensions of a later
+convolutional layer to accomodate this change. Also, our architecture trains from scratch, rather than use
+the VCG pre-trained weights to aid the learning process, like their modeld did.
 
-	https://fairyonice.github.io/Learn-about-Fully-Convolutional-Networks-for-semantic-segmentation.html
-		This paper was a major help in learning how to implement complex neural network sturctures in Keras using,
-		the functional API. The model architecture and the y_train mask segementation code are the main areas that
-		our code will resemble that found on this webpage. Changes that we made to edit this code is  
-		changing the default dimensions of the model input image, and subsequently change the dimensions of a later
-		convolutional layer to accomodate this change. Also, our architecture trains from scratch, rather than use
-		the VCG pre-trained weights to aid the learning process, like their modeld did.
-
-	OpenCV Fourier Transform: https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_transforms/py_fourier_transform/py_fourier_transform.html
-	
-	https://medium.com/coinmonks/learn-how-to-train-u-net-on-your-dataset-8e3f89fbd623
-	
-	https://github.com/AliMorty/Markov-Random-Field-Project
-	
-	https://medium.com/@keremturgutlu/semantic-segmentation-u-net-part-1-d8d6f6005066
-
+- OpenCV Fourier Transform: https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_transforms/py_fourier_transform/py_fourier_transform.html
+- https://medium.com/coinmonks/learn-how-to-train-u-net-on-your-dataset-8e3f89fbd623
+- https://github.com/AliMorty/Markov-Random-Field-Project
