@@ -32,7 +32,7 @@ Download and install Anaconda from (https://www.anaconda.com/distribution/#downl
 
 ### To start the environment 
 
-•	For PC like systems ```activate P2-theano```
+•	For PC like systems ```activate P2-theano```\
 •	For Unix like systems ```source activate P2-theano```
 
 ## Keras 
