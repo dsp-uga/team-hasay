@@ -57,7 +57,7 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 |--------|----------------------|----------|------------------|
 |  FCN   | #epoch:200,#batch:32      |   30.26       |   [Marcus Hill](https://github.com/Tallcus)               |
 |  U-Net | #epoch:200, #batch:8 |   31.91       | [Dhaval Bhanderi](https://github.com/dvlbhanderi)|
-|  MRF   |        -             | Not completed | [Dhaval Bhanderi]
+|  MRF   |        -             | Not completed | [Dhaval Bhanderi](https://github.com/dvlbhanderi)
 ### References:
 
 	[FCN Paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
