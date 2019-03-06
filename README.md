@@ -45,7 +45,7 @@ You can install Tensorflow using pip on command line, for CPU ```sudo pip instal
 
 ## Data 
 
-The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wikipedia.org/wiki/Differential_interference_contrast_microscopy) of cilia biopsies [published in this 2015 study.](http://stm.sciencemag.org/content/7/299/299ra124) For each video, you are provided 100 subsequent frames, which is roughly equal to about 0.5 seconds of real-time video (the framerate of each video is 200 fps). Since the videos are grayscale, if you read a single frame in and notice its data structure contains three color channels, you can safely pick one and drop the other two. Same goes for the masks. Speaking of the masks: each mask is the same spatial dimensions (height, width) as the corresponding video. Each pixel, however, is colored according to what it contains in the video:\
+The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wikipedia.org/wiki/Differential_interference_contrast_microscopy) of cilia biopsies [published in this 2015 study.](http://stm.sciencemag.org/content/7/299/299ra124) For each video, you are provided 100 subsequent frames, which is roughly equal to about 0.5 seconds of real-time video (the framerate of each video is 200 fps). Since the videos are grayscale, if you read a single frame in and notice its data structure contains three color channels, you can safely pick one and drop the other two. Same goes for the masks. Speaking of the masks: each mask is the same spatial dimensions (height, width) as the corresponding video. Each pixel, however, is colored according to what it contains in the video:
 
 •	2 corresponds to cilia (what you want to predict!)\
 •	1 corresponds to a cell\
