@@ -181,7 +181,7 @@ def get_accuracy(arr, labels):
                 correct_labels+=1
     return correct_labels/(len(arr[0])*len(arr))
 
-def a_complete_set_for_part_2 (arr, class_info, max_iter=1000000,var = 10000,
+def a_complete_set(arr, class_info, max_iter=1000000,var = 10000,
                                betha = 100,
                                neighbor_indices = [[0,1],[0,-1],[1,0],[-1,0]],
                                class_labels = [0,1,2], 
@@ -190,9 +190,6 @@ def a_complete_set_for_part_2 (arr, class_info, max_iter=1000000,var = 10000,
                                temprature_function_constant=None):
 
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(1,4)
-#     fig.suptitle('Comparision', fontsize=20)
-    
-
     ax1.set_title("first image")
     ax1.imshow(arr, cmap='gray')
     rows = len(arr)
