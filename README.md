@@ -8,7 +8,7 @@ Connecting the ciliary motion with clinical phenotypes is an active area of rese
 
 Follow the below steps for installation and to run the training and testing sets.
 
-### Prerequisites
+## Prerequisites
 
 - [Python 3.6](https://www.python.org/downloads/release/python-360/)
 - [Anaconda](https://www.anaconda.com/) - Python Environment virtualization.
@@ -17,12 +17,47 @@ Follow the below steps for installation and to run the training and testing sets
 - [OpenCV](https://opencv.org/) - Open-source library aimed for real-time Computer Vision
 - [Theano](http://www.deeplearning.net/software/theano/) - API used as Backend for Keras
 
-### Instalation
+## Installation
 
+## Anaconda 
 
+Anaconda is a free and open-source distribution of the Python and R programming languages for scientific computing, that aims to simplify package management and deployment.
 
+Download and install Anaconda from (https://www.anaconda.com/distribution/#download-section). 
 
-References:
+### Running Environment
+
+•	Once Anaconda is installed, open anaconda prompt using windows command Line.\
+•	Run conda env create -f environment.yml will install all packages required for all programs in this repository
+
+### To start the environment 
+
+•	For PC like systems activate P2-theano
+•	For Unix like systems source activate P2-theano
+
+## Keras 
+
+Keras is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano. You can install keras using pip on command line sudo pip install keras.
+
+## Tensorflow 
+
+You can install Tensorflow using pip on command line, for CPU sudo pip install tensorflow and for GPU sudo pip install tensorflow-gpu
+
+## Data 
+
+The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wikipedia.org/wiki/Differential_interference_contrast_microscopy) of cilia biopsies [published in this 2015 study.](http://stm.sciencemag.org/content/7/299/299ra124) For each video, you are provided 100 subsequent frames, which is roughly equal to about 0.5 seconds of real-time video (the framerate of each video is 200 fps). Since the videos are grayscale, if you read a single frame in and notice its data structure contains three color channels, you can safely pick one and drop the other two. Same goes for the masks. Speaking of the masks: each mask is the same spatial dimensions (height, width) as the corresponding video. Each pixel, however, is colored according to what it contains in the video:
+•	2 corresponds to cilia (what you want to predict!)
+•	1 corresponds to a cell
+•	0 corresponds to background (neither a cell nor cilia)
+
+## Results 
+
+| Method |     Configuration    | Accuracy |     Personnel    |
+|--------|----------------------|----------|------------------|
+|  FCN   | #epoch:,#batch:      |          |                  |
+|  U-Net | #epoch:200, #batch:8 |          | [Daval Bhandari](https://github.com/dvlbhanderi)|
+
+### References:
 
 	FCN Paper
 
