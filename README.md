@@ -60,9 +60,9 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 
 ### References:
 
-	FCN Paper
+	[FCN Paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
 
-	U-Net Paper
+	[U-Net Paper](https://arxiv.org/pdf/1505.04597.pdf)
 
 	https://fairyonice.github.io/Learn-about-Fully-Convolutional-Networks-for-semantic-segmentation.html
 		This paper was a major help in learning how to implement complex neural network sturctures in Keras using,
@@ -73,4 +73,8 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 		the VCG pre-trained weights to aid the learning process, like their modeld did.
 
 	OpenCV Fourier Transform: https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_transforms/py_fourier_transform/py_fourier_transform.html
+	
+	https://medium.com/coinmonks/learn-how-to-train-u-net-on-your-dataset-8e3f89fbd623
+	
+	https://github.com/AliMorty/Markov-Random-Field-Project
 
