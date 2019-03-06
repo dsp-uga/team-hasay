@@ -53,10 +53,10 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 
 ## Results 
 
-| Method |     Configuration    | Accuracy |     Personnel    |
+| Method |     Configuration    |   IOU    |     Personnel    |
 |--------|----------------------|----------|------------------|
-|  FCN   | #epoch:,#batch:      |          |                  |
-|  U-Net | #epoch:200, #batch:8 |          | [Dhaval Bhanderi](https://github.com/dvlbhanderi)|
+|  FCN   | epochs:200, batch:32 |   30.7   | [Marcus Hill](https://github.com/Tallcus)    |
+|  U-Net | epochs:200, batch: 8 |   31.9   | [Dhaval Bhanderi](https://github.com/dvlbhanderi)|
 
 ### References:
 
