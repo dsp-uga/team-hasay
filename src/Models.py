@@ -176,12 +176,12 @@ def normalize(img):
 	return img[:, :, :1]
 
 def load_training_data():
-	train_names = open('../../bucket/train.txt').read().split()
+	train_names = open('../data/train.txt').read().split()
 	x_train = []
 	y_train = []
 	n_classes = 3
 	for file_name in train_names:
-		img = cv2.imread('../frames_one_std/' + file_name + '.png')
+		img = cv2.imread('../data/frames_one_std/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
@@ -202,12 +202,12 @@ def load_training_data():
 	return x_train, y_train
 
 def load_testing_data():
-	test_names = open('../../bucket/test.txt').read().split()
+	test_names = open('../data/test.txt').read().split()
 	x_test = []
 	img_shapes = []
 	n_classes = 3
 	for file_name in test_names:
-		img = cv2.imread('../frames_one_std/' + file_name + '.png')
+		img = cv2.imread('../data/frames_one_std/' + file_name + '.png')
 		img_shapes.append(img.shape)
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
@@ -226,13 +226,14 @@ x_test, img_shapes, test_names = load_testing_data()
 model = unet(256, 256, 3)
 model.summary()
 
-#Best Optimizer Parameters for U-Net. Reccommend lr=0.3 for FCN8
+#Best Optimizer Parameters for U-Net. Reccommend setting lr=0.3 for FCN8
 sgd = optimizers.SGD(lr=0.01, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
 
 #Fit model using traning data. Both the best model found during training,
-#and the model trained for the entire duration of epochs are saved.
+#and the model trained for the entire duration of epochs are saved. For
+#FCN8, the recommended batch size is 32.
 model_path = '../models/Current_Best.h5'
 callbacks=[ModelCheckpoint(filepath=model_path, \
 		monitor='val_loss', save_best_only=True)]
