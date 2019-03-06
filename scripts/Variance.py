@@ -3,6 +3,7 @@
 import cv2
 import os
 import numpy as np
+from scipy.ndimage.filters import *
 
 bucket_path = '../../bucket/data'
 dir_names = os.listdir(bucket_path)
@@ -26,6 +27,7 @@ for dir_name in dir_names:
 			+ str(i) + '.png')	
 		row = img.shape[0]
 		col = img.shape[1]
+		img = median_filter(img, size=5)
 		for j in range(row):
 			for k in range(col):
 				mean[j][k] += img[j][k][0] / 100
@@ -38,9 +40,10 @@ for dir_name in dir_names:
 		img = cv2.imread(bucket_path + '/' \
 			+ dir_name + '/' + frame \
 			+ str(i) + '.png')	
+		img = median_filter(img, size=5)
 		row = img.shape[0]
 		col = img.shape[1]
 		for j in range(row):
 			for k in range(col):
 				variance[j][k] += (img[j][k][0] - mean[j][k])**2 / 100
-	np.save('../variances/' + dir_name, variance)
+	np.save('../variances_smoothed/' + dir_name, variance)
