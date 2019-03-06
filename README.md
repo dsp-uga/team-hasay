@@ -51,6 +51,9 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 •	1 corresponds to a cell\
 •	0 corresponds to background (neither a cell nor cilia)
 
+## Usage
+
+
 ## Results 
 
 | Method |     Configuration    |   IOU    |     Personnel    |
@@ -60,21 +63,17 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 
 ### References:
 
-	[FCN Paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
+- [FCN Paper](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
+- [U-Net Paper](https://arxiv.org/pdf/1505.04597.pdf)
+- https://fairyonice.github.io/Learn-about-Fully-Convolutional-Networks-for-semantic-segmentation.html
 
-	[U-Net Paper](https://arxiv.org/pdf/1505.04597.pdf)
+This paper was a major help in learning how to implement complex neural network sturctures in Keras using,
+the functional API. The model architecture and the y_train mask segementation code are the main areas that
+our code will resemble that found on this webpage. Changes that we made to edit this code is  
+changing the default dimensions of the model input image, and subsequently change the dimensions of a later
+convolutional layer to accomodate this change. Also, our architecture trains from scratch, rather than use
+the VCG pre-trained weights to aid the learning process, like their modeld did.
 
-	https://fairyonice.github.io/Learn-about-Fully-Convolutional-Networks-for-semantic-segmentation.html
-		This paper was a major help in learning how to implement complex neural network sturctures in Keras using,
-		the functional API. The model architecture and the y_train mask segementation code are the main areas that
-		our code will resemble that found on this webpage. Changes that we made to edit this code is  
-		changing the default dimensions of the model input image, and subsequently change the dimensions of a later
-		convolutional layer to accomodate this change. Also, our architecture trains from scratch, rather than use
-		the VCG pre-trained weights to aid the learning process, like their modeld did.
-
-	OpenCV Fourier Transform: https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_transforms/py_fourier_transform/py_fourier_transform.html
-	
-	https://medium.com/coinmonks/learn-how-to-train-u-net-on-your-dataset-8e3f89fbd623
-	
-	https://github.com/AliMorty/Markov-Random-Field-Project
-
+- OpenCV Fourier Transform: https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_transforms/py_fourier_transform/py_fourier_transform.html
+- https://medium.com/coinmonks/learn-how-to-train-u-net-on-your-dataset-8e3f89fbd623
+- https://github.com/AliMorty/Markov-Random-Field-Project
