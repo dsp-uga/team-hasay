@@ -19,7 +19,7 @@ Follow the below steps for installation and to run the training and testing sets
 
 ## Installation
 
-## Anaconda 
+### Anaconda 
 
 Anaconda is a free and open-source distribution of the Python and R programming languages for scientific computing, that aims to simplify package management and deployment.
 
@@ -35,11 +35,11 @@ Download and install Anaconda from (https://www.anaconda.com/distribution/#downl
 •	For PC like systems ```activate P2-theano```\
 •	For Unix like systems ```source activate P2-theano```
 
-## Keras 
+### Keras 
 
 Keras is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano. You can install keras using pip on command line ```sudo pip install keras```.
 
-## Tensorflow 
+### Tensorflow 
 
 You can install Tensorflow using pip on command line, for CPU ```sudo pip install tensorflow``` and for GPU ```sudo pip install tensorflow-gpu```
 
@@ -77,4 +77,6 @@ The data itself are grayscale 8-bit images taken with [DIC optics](https://en.wi
 	https://medium.com/coinmonks/learn-how-to-train-u-net-on-your-dataset-8e3f89fbd623
 	
 	https://github.com/AliMorty/Markov-Random-Field-Project
+	
+	https://medium.com/@keremturgutlu/semantic-segmentation-u-net-part-1-d8d6f6005066
 
