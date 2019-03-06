@@ -128,26 +128,21 @@ def unet(input_height, input_width, n_classes):
     drop5 = Dropout(0.5)(conv5)
 
     up6 = Conv2D(512, 2, activation = 'relu', padding = 'same', data_format='channels_last')(UpSampling2D(size = (2,2))(drop5))
-    #up6 = Cropping2D(cropping = ((1,0), (0,0)))(up6)
-    #merge6 = concatenate([drop4,up6], axis = 3)
     merge6 = Add(name='layer_fusion1')([drop4, up6])
     conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', data_format='channels_last')(merge6)
     conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv6)
 
     up7 = Conv2D(256, 2, activation = 'relu', padding = 'same', data_format='channels_last')(UpSampling2D(size = (2,2))(conv6))
-    #merge7 = concatenate([conv3,up7], axis = 3)
     merge7 = Add(name='layer_fusion2')([conv3, up7])
     conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', data_format='channels_last')(merge7)
     conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv7)
 
     up8 = Conv2D(128, 2, activation = 'relu', padding = 'same', data_format='channels_last')(UpSampling2D(size = (2,2))(conv7))
-    #merge8 = concatenate([conv2,up8], axis = 3)
     merge8 = Add(name='layer_fusion3')([conv2, up8])
     conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', data_format='channels_last')(merge8)
     conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv8)
 
     up9 = Conv2D(64, 2, activation = 'relu', padding = 'same', data_format='channels_last')(UpSampling2D(size = (2,2))(conv8))
-    #merge9 = concatenate([conv1,up9], axis = 3)
     merge9 = Add(name='layer_fusion4')([conv1, up9])
     conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', data_format='channels_last')(merge9)
     conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', data_format='channels_last')(conv9)
@@ -181,13 +176,12 @@ def normalize(img):
 	return img[:, :, :1]
 
 def load_training_data():
-	train_names = open('../../bucket/train.txt').read().split()
+	train_names = open('../data/train.txt').read().split()
 	x_train = []
 	y_train = []
 	n_classes = 3
 	for file_name in train_names:
-		img = cv2.imread('../frames_one_std/' + file_name + '.png')
-		#img = cv2.imread('../frames_smoothed_one_std/' + file_name + '.png')
+		img = cv2.imread('../data/frames_one_std/' + file_name + '.png')
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
 				interpolation = cv2.INTER_AREA)
@@ -208,13 +202,12 @@ def load_training_data():
 	return x_train, y_train
 
 def load_testing_data():
-	test_names = open('../../bucket/test.txt').read().split()
+	test_names = open('../data/test.txt').read().split()
 	x_test = []
 	img_shapes = []
 	n_classes = 3
 	for file_name in test_names:
-		img = cv2.imread('../frames_one_std/' + file_name + '.png')
-		#img = cv2.imread('../frames_smoothed_one_std/' + file_name + '.png')
+		img = cv2.imread('../data/frames_one_std/' + file_name + '.png')
 		img_shapes.append(img.shape)
 		if img.shape[0] != 256 or img.shape[1] != 256:
 			img  = cv2.resize(img, (256, 256), \
@@ -225,30 +218,31 @@ def load_testing_data():
 	x_test = np.array(x_test)
 	return x_test, img_shapes, test_names
 	
-#Main
+#Load in training, test, and img resolution data
 x_train, y_train = load_training_data()
 x_test, img_shapes, test_names = load_testing_data()
 
-#model = fcn8(256, 256, 3)
+#Select a model, and print out it's architecture summary
 model = unet(256, 256, 3)
 model.summary()
 
-#sgd = optimizers.SGD(lr=0.3, decay=5**(-4), momentum=0.9, nesterov=True)
+#Best Optimizer Parameters for U-Net. Reccommend setting lr=0.3 for FCN8
 sgd = optimizers.SGD(lr=0.01, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
 
+#Fit model using traning data. Both the best model found during training,
+#and the model trained for the entire duration of epochs are saved. For
+#FCN8, the recommended batch size is 32.
 model_path = '../models/Current_Best.h5'
 callbacks=[ModelCheckpoint(filepath=model_path, \
 		monitor='val_loss', save_best_only=True)]
 model.fit(x_train, y_train, batch_size=8, epochs=200, validation_split=0.1, callbacks=callbacks)
 model.save('../models/Full.h5')
 
-#Full
+#Test model trained on the full number of epochs
 pred = model.predict(x_test)
 pred_imgs = np.argmax(pred, axis=3)
-
-#Work-around to resize and save images, due to cv2 bug
 for i in range(len(pred_imgs)):
 	output_path = '../predictions/full_outputs/' \
 			+ test_names[i] \
@@ -262,11 +256,10 @@ for i in range(len(pred_imgs)):
 			interpolation=cv2.INTER_CUBIC)
 		cv2.imwrite(output_path, img)
 
-#Best Val_loss
+#Test best model trained, based on the val_loss
 model = keras.models.load_model(model_path)
 pred = model.predict(x_test)
 pred_imgs = np.argmax(pred, axis=3)
-
 for i in range(len(pred_imgs)):
 	output_path = '../predictions/best_outputs/' \
 			+ test_names[i] \
