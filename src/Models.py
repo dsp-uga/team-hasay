@@ -10,7 +10,7 @@ from keras import optimizers
 from keras.callbacks import *
 from scipy.ndimage.filters import *
 
-def FCN8(input_height, input_width, n_classes):
+def fcn8(input_height, input_width, n_classes):
 	input_img = Input(shape=(input_height, input_width, 1))
 	activation = 'relu'
 	
@@ -229,10 +229,11 @@ def load_testing_data():
 x_train, y_train = load_training_data()
 x_test, img_shapes, test_names = load_testing_data()
 
-#model = FCN8(256, 256, 3)
+#model = fcn8(256, 256, 3)
 model = unet(256, 256, 3)
 model.summary()
 
+#sgd = optimizers.SGD(lr=0.3, decay=5**(-4), momentum=0.9, nesterov=True)
 sgd = optimizers.SGD(lr=0.01, decay=5**(-4), momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, \
 		metrics=['accuracy'])
